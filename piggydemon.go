@@ -16,8 +16,8 @@ const (
 	INPORT    int   = 9999 // port to bind this program to
 	INBUFSIZE int   = 512
 	TIMEOUT   int64 = 9000000000 // 9 sec timeout
-//	RENDERFARMPATH string = "/storage/renderfarm/"
-	RENDERFARMPATH string = "./storage/renderfarm/"
+	RENDERFARMPATH string = "/storage/renderfarm/"
+//	RENDERFARMPATH string = "./storage/renderfarm/"
 	CONFIGPATH     string = RENDERFARMPATH + "configs/"
 	ETHERWAKE      string = "/usr/local/sbin/etherwake"
 )
@@ -373,7 +373,7 @@ func callGetImages(argc int, argv []string) (result []string) {
 	if len(argv) == 0 {
 		return []string{"#konnte rechnerliste nicht zusammenstellen"}
 	} else {
-		layoutNames := runSystemCommand([]string{"ls", "baselayouts/"}, RENDERFARMPATH)
+		layoutNames := runSystemCommand([]string{"ls", "basesystems/"}, RENDERFARMPATH)
 		fmt.Printf("\n%d baselayouts gefunden", layoutNames)
 		result = getRidOfDummies(strings.Split(layoutNames, "\n", 0))
 	}
