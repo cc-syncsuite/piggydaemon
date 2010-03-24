@@ -10,6 +10,7 @@ import "io"
 import "io/ioutil"
 import "bufio"
 import "regexp"
+import "sort"
 //import "container/vector"
 
 const (
@@ -376,6 +377,7 @@ func callGetImages(argc int, argv []string) (result []string) {
 		layoutNames := runSystemCommand([]string{"ls", "basesystems/"}, RENDERFARMPATH)
 		fmt.Printf("\n%d baselayouts gefunden", layoutNames)
 		result = getRidOfDummies(strings.Split(layoutNames, "\n", 0))
+		sort.SortStrings(result)
 	}
 	return
 }
@@ -393,6 +395,7 @@ func callGetClients(argc int, argv []string) (result []string) {
 		hostnames := runSystemCommand(catCommand, RENDERFARMPATH+"configs/")
 		hostnames = hostnames[0:(len(hostnames) - 1)]
 		result = getRidOfDummies(strings.Split(hostnames, "\n", 0))
+		sort.SortStrings(result)
 	}
 	return
 }
