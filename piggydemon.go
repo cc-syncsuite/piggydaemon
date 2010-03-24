@@ -393,6 +393,16 @@ func runSystemCommand(argv []string, dir string) string {
 	io.Copy(&b, r)
 	return b.String()
 }
+
+func isWhite(b byte) bool { return b == ' ' || b == '\n' || b == '\t' }
+
+func myTrim(s string) string {
+        var i, j int
+        for i = 0; i < len(s) && isWhite(s[i]); i++ { }
+        for j = len(s) - 1; j > 0 && isWhite(s[j]); j-- { }
+        return s[i : j+1]
+}
+
 func getInfoByRechnername(rechnerName string) []string {
 	fmt.Printf("---\n")
 	// ls get mac,name,ip
@@ -400,6 +410,9 @@ func getInfoByRechnername(rechnerName string) []string {
 		[]string{"grep", "-RB1", rechnerName, "."},
 		CONFIGPATH)
 	fmt.Printf(output)
+	if len(myTrim(output)) == 0 {
+		return []string{"#Not a valid name;"}
+	}
 	fmt.Printf("---\n")
 	lsLines := strings.Split(output, "\n", 0)
 	fmt.Printf("\"%s\"\n", lsLines[0])
