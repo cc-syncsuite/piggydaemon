@@ -197,7 +197,7 @@ func callSet2(argc int, argv []string) (result []string) {
 
 func callSet(argc int, argv []string) (result []string) {
 	result = []string{"#zu wenige argumente"}
-	if len(argv) < 9 {
+	if len(argv) < 8 {
 		return
 	}
 	//neuen Rechnernamen aus dem request entfernen
@@ -232,7 +232,7 @@ func callSet(argc int, argv []string) (result []string) {
 	gatewayNeu := argv[5]
 	dnsNeu := argv[6]
 	imageNeu := argv[7]
-	macNeu := argv[8]
+	macNeu := macPureAlt
 	macPureNeu := strings.Join(strings.Split(macNeu, ":", 0), "")
 	fmt.Printf("macNeu: %s\n", macNeu)
 	fmt.Printf("macPureNeu: %s\n", macPureNeu)
