@@ -257,7 +257,7 @@ func callSet(argc int, argv []string) (result []string) {
 		"\taddress " + ipNeu + "\n" +
 		"\tnetmask " + subnetNeu + "\n" +
 		"\tgateway " + gatewayNeu + "\n" +
-		"\tdns-nameserver " + dnsNeu)
+		"\tdns-nameserver " + dnsNeu + "\n")
 	if e != nil {
 		result = []string{"#could not write file " + filePath}
 		return
@@ -403,7 +403,7 @@ func getInfoByRechnername(rechnerName string) []string {
 	fmt.Printf("---\n")
 	lsLines := strings.Split(output, "\n", 0)
 	fmt.Printf("\"%s\"\n", lsLines[0])
-	fmt.Printf("\"%s\"\n", lsLines[1])
+//	fmt.Printf("\"%s\"\n", lsLines[1])
 	lsReader0 := strings.NewReader(lsLines[0])
 	//lsReader1 := strings.NewReader(lsLines[1])
 	var macBuf, macPureBuf bytes.Buffer
