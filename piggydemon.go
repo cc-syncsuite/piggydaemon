@@ -14,10 +14,9 @@ import "regexp"
 
 const (
 	INPORT    int   = 9999 // port to bind this program to
-	RCPORT    int   = 9999 // port, renderclients listen at
 	INBUFSIZE int   = 512
 	TIMEOUT   int64 = 9000000000 // 9 sec timeout
-	//	RENDERFARMPATH string = "/storage/renderfarm/"
+//	RENDERFARMPATH string = "/storage/renderfarm/"
 	RENDERFARMPATH string = "./storage/renderfarm/"
 	CONFIGPATH     string = RENDERFARMPATH + "configs/"
 	ETHERWAKE      string = "/usr/local/sbin/etherwake"
@@ -384,14 +383,14 @@ func callGetClients(argc int, argv []string) (result []string) {
 	if len(argv) == 0 {
 		return []string{"#konnte rechnerliste nicht zusammenstellen"}
 	} else {
-		hostnameFiles := runSystemCommand([]string{"find", ".", "-name", "hostname"}, RENDERFARMPATH)
-		catCommandStr := "cat\n" + hostnameFiles
+		hostnameFiles := runSystemCommand([]string{"find", ".", "-name", "network"}, RENDERFARMPATH+"configs/")
+		catCommandStr := "tail\n-n1\n-q\n" + hostnameFiles
 		catCommand := strings.Split(catCommandStr, "\n", 0)
 		catCommand = catCommand[0:(len(catCommand) - 1)]
 		for i, k := range catCommand {
 			fmt.Printf("\ncatCommand[%d]\"%s\"\n", i, k)
 		}
-		hostnames := runSystemCommand(catCommand, RENDERFARMPATH)
+		hostnames := runSystemCommand(catCommand, RENDERFARMPATH+"configs/")
 		hostnames = hostnames[0:(len(hostnames) - 1)]
 		result = getRidOfDummies(strings.Split(hostnames, "\n", 0))
 	}
