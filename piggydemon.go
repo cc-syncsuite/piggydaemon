@@ -270,14 +270,14 @@ func callSet(argc int, argv []string) (result []string) {
 		return
 	}
 	_, e = fd.WriteString("auto lo\n" +
-		"iface lo inet network\n" +
+		"iface lo inet loopback\n" +
 		"\n" +
 		"auto eth0\n" +
 		"iface eth0 inet static\n" +
 		"\taddress " + ipNeu + "\n" +
 		"\tnetmask " + subnetNeu + "\n" +
 		"\tgateway " + gatewayNeu + "\n" +
-		"\tdns-nameserver " + dnsNeu + "\n")
+		"\tdns-nameservers " + dnsNeu + "\n")
 	if e != nil {
 		result = []string{"#could not write file " + filePath}
 		return
