@@ -20,7 +20,7 @@ const (
 	//	RENDERFARMPATH string = "/storage/renderfarm/"
 	RENDERFARMPATH string = "./storage/renderfarm/"
 	CONFIGPATH     string = RENDERFARMPATH + "configs/"
-	ETHERWAKE string = "/usr/local/sbin/etherwake"
+	ETHERWAKE      string = "/usr/local/sbin/etherwake"
 )
 
 
@@ -122,12 +122,15 @@ func parseCommand(argc int, argv []string) (result []string) {
 	case "set":
 		fmt.Printf("CALL SET\n")
 		result = callSet(argc, argv)
-	case "shutdown":
-		fmt.Printf("CALL SHUTDOWN\n")
-		result = callShutdownRebootState(argc, argv)
-	case "reboot":
-		fmt.Printf("CALL REBOOT\n")
-		result = callShutdownRebootState(argc, argv)
+		//	case "shutdown":
+		//		fmt.Printf("CALL SHUTDOWN\n")
+		//		result = callShutdownRebootState(argc, argv)
+		//	case "reboot":
+		//		fmt.Printf("CALL REBOOT\n")
+		//		result = callShutdownRebootState(argc, argv)
+	case "exec":
+		fmt.Printf("CALL EXEC\n")
+		result = callExec(argc, argv)
 	case "wol":
 		fmt.Printf("CALL WOL\n")
 		result = callWOL(argc, argv)
@@ -135,8 +138,9 @@ func parseCommand(argc int, argv []string) (result []string) {
 	fmt.Printf("CALL VNC\n")*/
 	/*case "copy":
 	fmt.Printf("CALL COPY\n")*/
-	case "querystate":
-		fmt.Printf("CALL QUERYSTATE\n")
+	case "cp":
+		fmt.Printf("CALL CP\n")
+		result = callCp(argc, argv)
 	default:
 		fmt.Printf("KEINE FUNKTION GEFUNDEN")
 		result = []string{"#keine funktion gefunden"}
@@ -144,10 +148,37 @@ func parseCommand(argc int, argv []string) (result []string) {
 	return
 	//return "unknown feature. use get,set,shutdown,reboot,vnc,copy,querystate"
 }
-// get;render-23;192.168.1.123;255.255.255.0;192.168.1.254;192.168.0.1211;base1;00:11:22:33:44:55;001122334455;!
+
+func sendToClient(addr string, argv []string) []string {
+	conn, e := net.Dial("tcp", "", addr)
+	if e != nil {
+		return []string{"#Could not connect"}
+	}
+	_, e = conn.Write([]byte(strings.Join(argv, ";") + ";!"))
+	if e != nil {
+		return []string{"#Error while writing"}
+	}
+	return []string{"OK"}
+
+}
+
+func callCp(argc int, argv []string) []string {
+	addr := argv[1]
+	newArgv := argv[2:]
+	newArgv = strings.Split("cp;"+strings.Join(newArgv, ";"), ";", 0)
+	return sendToClient(addr, newArgv)
+}
+
+func callExec(argc int, argv []string) []string {
+	addr := argv[1]
+	newArgv := argv[2:]
+	newArgv = strings.Split("exec;"+strings.Join(newArgv, ";"), ";", 0)
+	return sendToClient(addr, newArgv)
+}
+
 func callWOL(argc int, argv []string) (result []string) {
 	rechnerInfo := getInfoByRechnername(argv[1])
-	p,e := exec.Run(ETHERWAKE, []string{ETHERWAKE, rechnerInfo[6]}, nil, "/", exec.DevNull, exec.DevNull, exec.DevNull)
+	p, e := exec.Run(ETHERWAKE, []string{ETHERWAKE, rechnerInfo[6]}, nil, "/", exec.DevNull, exec.DevNull, exec.DevNull)
 	if e != nil {
 		return []string{"#Error calling etherwake"}
 	}
@@ -155,36 +186,6 @@ func callWOL(argc int, argv []string) (result []string) {
 	return []string{"OK"}
 }
 
-func callShutdownRebootState(argc int, argv []string) (result []string) {
-	result = []string{"#ip nicht angegeben"}
-	if (len(argv) > 1) && (argv[1] != "") {
-		rcAddr, e := net.ResolveTCPAddr(argv[1])
-		if e != nil {
-			return []string{"#ungueltige ip"}
-		}
-		lAddr, _ := net.ResolveTCPAddr("")
-		rcConn, e := net.DialTCP("tcp4", lAddr, rcAddr)
-		if e != nil {
-			return []string{"#verbindung nicht abgebaut"}
-		}
-		_, e = rcConn.Write([]byte(argv[0] + ";!"))
-		if e != nil {
-			return []string{"#fehler beim senden an den renderclient"}
-		}
-
-		bufioReader := bufio.NewReader(rcConn)
-		rrAnswer, e := bufioReader.ReadBytes('!')
-		if e != nil {
-			return []string{"#fehler beim empfangen der antwort"}
-		}
-
-		rrAnswerLines := strings.Split(string(rrAnswer), ";", 0)
-		return rrAnswerLines
-
-		rcConn.Close()
-	}
-	return
-}
 
 func callSet2(argc int, argv []string) (result []string) {
 	result = []string{"#rechnername nicht angegeben"}
@@ -411,10 +412,12 @@ func runSystemCommand(argv []string, dir string) string {
 func isWhite(b byte) bool { return b == ' ' || b == '\n' || b == '\t' }
 
 func myTrim(s string) string {
-        var i, j int
-        for i = 0; i < len(s) && isWhite(s[i]); i++ { }
-        for j = len(s) - 1; j > 0 && isWhite(s[j]); j-- { }
-        return s[i : j+1]
+	var i, j int
+	for i = 0; i < len(s) && isWhite(s[i]); i++ {
+	}
+	for j = len(s) - 1; j > 0 && isWhite(s[j]); j-- {
+	}
+	return s[i : j+1]
 }
 
 func getInfoByRechnername(rechnerName string) []string {
@@ -430,7 +433,7 @@ func getInfoByRechnername(rechnerName string) []string {
 	fmt.Printf("---\n")
 	lsLines := strings.Split(output, "\n", 0)
 	fmt.Printf("\"%s\"\n", lsLines[0])
-//	fmt.Printf("\"%s\"\n", lsLines[1])
+	//	fmt.Printf("\"%s\"\n", lsLines[1])
 	lsReader0 := strings.NewReader(lsLines[0])
 	//lsReader1 := strings.NewReader(lsLines[1])
 	var macBuf, macPureBuf bytes.Buffer
