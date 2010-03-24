@@ -110,7 +110,6 @@ func parseCommand(argc int, argv []string) (result []string) {
 		fmt.Printf("\nCALL GETCLIENTS\n")
 		// DUMMY:
 		result = callGetClients(argc,argv)
-		result = result[0:len(result)-1]
 	case "getimages":
 		fmt.Printf("CALL GETIMAGES\n")
 		// DUMMY:
@@ -245,7 +244,7 @@ func callSet(argc int, argv []string) (result []string) {
 		runSystemCommand([]string{"mv",macPureAlt,macPureNeu},RENDERFARMPATH+"overlays/")
 	}
 	// write overlays/:::::/network/interfaces
-	filePath := RENDERFARMPATH + "overlays/" + macPureNeu + "/network/interfaces"
+	filePath := RENDERFARMPATH + "overlays/" + macPureNeu + "/etc/network/interfaces"
 	fd,e := os.Open(filePath,os.O_WRONLY,0)
 	if e != nil {
 		result = []string{"#could not open file " + filePath}
@@ -464,19 +463,19 @@ func getInfoByRechnername(rechnerName string) ( []string) {
 func getSubnetGatewayDns (macPureString string) (subnetString, gatewayString, dnsString string) {
 	//get subnet-mask
 	output := runSystemCommand(
-		[]string{"grep", "netmask","network/interfaces"},
+		[]string{"grep", "netmask","etc/network/interfaces"},
 		RENDERFARMPATH + "overlays/" + macPureString)
 	subnetFields := strings.Fields(output)
 	subnetString = subnetFields[1]
 	//get gateway
 	output = runSystemCommand(
-		[]string{"grep", "gateway","network/interfaces"},
+		[]string{"grep", "gateway","etc/network/interfaces"},
 		RENDERFARMPATH + "overlays/" + macPureString)
 	gatewayFields := strings.Fields(output)
 	gatewayString = gatewayFields[1]
 	//get dns
 	output = runSystemCommand(
-		[]string{"grep", "dns-nameserver","network/interfaces"},
+		[]string{"grep", "dns-nameserver","etc/network/interfaces"},
 		RENDERFARMPATH + "overlays/" + macPureString)
 	dnsFields := strings.Fields(output)
 	dnsString = dnsFields[1]
