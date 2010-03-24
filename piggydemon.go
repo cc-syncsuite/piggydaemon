@@ -20,6 +20,7 @@ const (
 	//	RENDERFARMPATH string = "/storage/renderfarm/"
 	RENDERFARMPATH string = "./storage/renderfarm/"
 	CONFIGPATH     string = RENDERFARMPATH + "configs/"
+	ETHERWAKE string = "/usr/local/sbin/etherwake"
 )
 
 
@@ -127,6 +128,9 @@ func parseCommand(argc int, argv []string) (result []string) {
 	case "reboot":
 		fmt.Printf("CALL REBOOT\n")
 		result = callShutdownRebootState(argc, argv)
+	case "wol":
+		fmt.Printf("CALL WOL\n")
+		result = callWOL(argc, argv)
 	/*case "vnc":
 	fmt.Printf("CALL VNC\n")*/
 	/*case "copy":
@@ -139,6 +143,16 @@ func parseCommand(argc int, argv []string) (result []string) {
 	}
 	return
 	//return "unknown feature. use get,set,shutdown,reboot,vnc,copy,querystate"
+}
+// get;render-23;192.168.1.123;255.255.255.0;192.168.1.254;192.168.0.1211;base1;00:11:22:33:44:55;001122334455;!
+func callWOL(argc int, argv []string) (result []string) {
+	rechnerInfo := getInfoByRechnername(argv[1])
+	p,e := exec.Run(ETHERWAKE, []string{ETHERWAKE, rechnerInfo[6]}, nil, "/", exec.DevNull, exec.DevNull, exec.DevNull)
+	if e != nil {
+		return []string{"#Error calling etherwake"}
+	}
+	p.Wait(0)
+	return []string{"OK"}
 }
 
 func callShutdownRebootState(argc int, argv []string) (result []string) {
