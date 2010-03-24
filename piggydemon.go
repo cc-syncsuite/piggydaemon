@@ -158,7 +158,12 @@ func sendToClient(addr string, argv []string) []string {
 	if e != nil {
 		return []string{"#Error while writing"}
 	}
-	return []string{"OK"}
+	answer, e := bufio.NewReader(conn).ReadString('!')
+	if e != nil {
+		return []string{"#Could not receive answer"}
+	}
+	conn.Close()
+	return strings.Split(answer[0:len(answer)-1], ";", 0)
 
 }
 
